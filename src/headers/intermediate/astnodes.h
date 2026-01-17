@@ -10,6 +10,7 @@
 namespace BLSL
 {
     namespace ASTNode {
+        class Visitor;
         struct Node;
         struct BodyNode;
     }
@@ -31,6 +32,8 @@ namespace BLSL
         {
             virtual ~Node() = default;
             DebugPosition debugPos;
+
+            virtual void invite(Visitor& visitor) = 0;
         };
 
         struct BodyNode
@@ -47,11 +50,16 @@ namespace BLSL
         {
             LiteralType type;
             std::string value;
+
+            void invite(Visitor& visitor) override;
         };
 
         struct Variable : public Node
         {
             std::string identifier;
+
+
+            void invite(Visitor& visitor) override;
         };
 
         /*
@@ -72,6 +80,8 @@ namespace BLSL
         {
             Node_t left;
             Node_t right;
+
+            void invite(Visitor& visitor) override;
         };
 
 
@@ -130,6 +140,28 @@ namespace BLSL
         };
     }
 
+
+    namespace ASTNode
+    {
+        class Visitor
+        {
+        public:
+            virtual void visit(BinaryOperator* node) = 0;
+            virtual void visit(Literal* node) = 0;
+            virtual void visit(Variable* node) = 0;
+        };
+
+        class ConsoleVisitor : public Visitor
+        {
+        public:
+            void visit(BinaryOperator* node) override;
+            void visit(Literal* node) override;
+            void visit(Variable* node) override;
+        };
+    }
+
 }
+
+
 
 #endif //BLSLANG_ASTNODES_H

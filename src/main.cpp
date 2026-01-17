@@ -19,6 +19,11 @@ int main()
 
     BLSL::Node_t parseOut = parser.parse();
 
+    BLSL::ASTNode::ConsoleVisitor visitor;
+
+    std::print("AST:");
+
+    parseOut->invite(visitor);
 
     std::print("Timeout");
 }
