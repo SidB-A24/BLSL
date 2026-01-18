@@ -28,6 +28,7 @@ add_executable(BLSLang src/main.cpp
         src/implementations/runtime/arena.cpp
         src/implementations/runtime/operator.cpp
         src/implementations/intermediate/astnodes.cpp
+        src/headers/err/err.h
 
 
 )

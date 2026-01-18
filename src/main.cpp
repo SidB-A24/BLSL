@@ -6,6 +6,7 @@
 #include "headers/core/blsl.h"
 #include "headers/intermediate/lexer.h"
 #include "headers/intermediate/parser.h"
+#include "headers/log/log.h"
 
 int main()
 {
@@ -27,6 +28,7 @@ int main()
 
     parseOut->invite(visitor);
 
-    std::println("-- End --");
+    std::cout << BLSL::Log::Mod::BLUE << BLSL::Log::TIME << BLSL::Log::Mod::CLEAR << std::endl;
+    std::cout << BLSL::Log::box("Program End!", BLSL::Log::Mod::RED, BLSL::Log::Mod::MAGENTA, BLSL::Log::Mod::GREEN);
 }
 
