@@ -260,8 +260,34 @@ std::vector<size_t> BLSL::Parser::_consume_compile_time_size_list()
 
 BLSL::Node_t BLSL::Parser::_parse_for()
 {
+    Token head = _next();
+    ASTNode::For forNode;
+    forNode.debugPos = head.debugPos;
+
+    _consume_punctuator(PunctuatorType::LPAREN);
+
+    if (_match_punctuator(PunctuatorType::SEMICOLON)) forNode.initialize = std::nullopt;
+    else forNode.initialize = _parse_expression();
+
+    _consume_punctuator(PunctuatorType::SEMICOLON);
+
+    if (_match_punctuator(PunctuatorType::SEMICOLON)) forNode.condition = std::nullopt;
+    else forNode.condition = _parse_expression();
+
+    _consume_punctuator(PunctuatorType::SEMICOLON);
+
+    if (_match_punctuator(PunctuatorType::RPAREN)) forNode.update = std::nullopt;
+    else forNode.update = _parse_expression();
+
+
+    _consume_punctuator(PunctuatorType::RPAREN);
+
+    forNode.body = _parse_statement();
+
+    return std::make_unique<ASTNode::For>(std::move(forNode));
 
 }
+
 BLSL::Node_t BLSL::Parser::_parse_while() {}
 
 
@@ -269,6 +295,7 @@ BLSL::Node_t BLSL::Parser::_parse_if()
 {
     Token head = _next();
     ASTNode::If ifNode;
+    ifNode.debugPos = head.debugPos;
 
     _consume_punctuator(PunctuatorType::LPAREN);
 
@@ -345,6 +372,36 @@ BLSL::Node_t BLSL::Parser::_parse_func()
     funcNode.body = _parse_statement();
 
     return std::make_unique<ASTNode::Func>(std::move(funcNode));
+}
+
+BLSL::Node_t BLSL::Parser::_parse_meminit()
+{
+    Token head = _next();
+    ASTNode::MemInit memInitNode;
+    memInitNode.debugPos = head.debugPos;
+
+    memInitNode.size = _consume_compile_time_size();
+
+    return std::make_unique<ASTNode::MemInit>(std::move(memInitNode));
+}
+
+BLSL::Node_t BLSL::Parser::_parse_alloc()
+{
+    Token head = _next();
+    ASTNode::Alloc allocNode;
+    allocNode.debugPos = head.debugPos;
+
+    auto identifierExpected = _get_identifier();
+    if (!identifierExpected.has_value())
+    {
+        //TODO throw
+        throw;
+    }
+
+    allocNode.identifier = identifierExpected.value();
+    allocNode.size = _consume_compile_time_size();
+
+    return std::make_unique<ASTNode::Alloc>(std::move(allocNode));
 }
 
 BLSL::Node_t BLSL::Parser::_parse_expression(int lowestPrecedence)
@@ -452,6 +509,10 @@ BLSL::Node_t BLSL::Parser::_parse_statement()
         case TokenType::KEYWORD:
             switch (std::get<KeywordType>(_peek().subType))
             {
+            case KeywordType::IDENTIFIER_PLACEHOLDER:
+                //TODO THRow
+                throw;
+
             case KeywordType::FOR:
                 return _parse_for();
 
@@ -466,7 +527,14 @@ BLSL::Node_t BLSL::Parser::_parse_statement()
 
             case KeywordType::FUNC:
                 return _parse_func();
+
+            case KeywordType::MEMINIT:
+                return _parse_meminit();
+
+            case KeywordType::ALLOC:
+                return _parse_alloc();
             }
+
 
         default:
             throw;

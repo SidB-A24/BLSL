@@ -49,6 +49,8 @@ namespace BLSL
         Node_t _parse_else();
 
         Node_t _parse_func();
+        Node_t _parse_meminit();
+        Node_t _parse_alloc();
 
         Node_t _parse_expression(int lowestPrecedence = -1);
         BodyNode_t _parse_block();

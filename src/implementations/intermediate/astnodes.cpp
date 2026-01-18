@@ -97,7 +97,7 @@ void BLSL::ASTNode::PrintVisitor::visit(Variable *node)
 
 void BLSL::ASTNode::PrintVisitor::visit(Func *node)
 {
-    _out_indent() << "Func " << node->identifier << "<" << node->returnSize << ">\n";
+    _out_indent() << "func " << node->identifier << "<" << node->returnSize << ">\n";
     _out_indent() << "(";
     for (auto formalParam : node->parameters)
     {
@@ -106,7 +106,28 @@ void BLSL::ASTNode::PrintVisitor::visit(Func *node)
     _out() << ")\n";
     node->body->invite(*this);
 }
-void BLSL::ASTNode::PrintVisitor::visit(For *node) {}
+void BLSL::ASTNode::PrintVisitor::visit(For *node)
+{
+    _out_indent() << "for" << "(\n";
+    _indent();
+    if (node->initialize.has_value())
+    {
+        node->initialize.value()->invite(*this);
+    }
+    _out_indent() << ";\n";
+    if (node->condition.has_value())
+    {
+        node->condition.value()->invite(*this);
+    }
+    _out_indent() << ";\n";
+    if (node->update.has_value())
+    {
+        node->update.value()->invite(*this);
+    }
+    _out_indent() << ")\n";
+
+    node->body->invite(*this);
+}
 void BLSL::ASTNode::PrintVisitor::visit(While *node) {}
 
 void BLSL::ASTNode::PrintVisitor::visit(If *node)
