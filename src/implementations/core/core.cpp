@@ -81,4 +81,32 @@ namespace BLSL
 
 
 
+    namespace Bytecode
+    {
+        instruction_t make_instruction(opcode_t opcode, operand_t a, operand_t b, operand_t c, flag_t flags)
+        {
+            instruction_t instruction = 0;
+
+            instruction |= (opcode << OPCODE_SHIFT) & OPCODE_MASK;
+            instruction |= (a << OPND_A_SHIFT) & OPND_A_MASK;
+            instruction |= (b << OPND_B_SHIFT) & OPND_B_MASK;
+            instruction |= (c << OPND_C_SHIFT) & OPND_C_MASK;
+            instruction |= (flags << FLAGBT_SHIFT) & FLAGBT_MASK;
+
+            return instruction;
+        }
+
+        bool is_register(operand_t operand)
+        {
+            return operand & OPND_TYPE_MASK;
+        }
+
+        void set_register_flag(operand_t& operand, bool value)
+        {
+            operand |= (value << OPND_T_SHIFT) & OPND_TYPE_MASK;
+        }
+    }
+
+
+
 }

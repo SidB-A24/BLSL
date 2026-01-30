@@ -82,7 +82,7 @@ namespace std
     inline ostream& operator<<(ostream& os, const BLSL::Log::_TimeStreamDispatchType time)
     {
         using clock = std::chrono::system_clock;
-        auto now = clock::to_time_t(clock::now());
+        time_t now = clock::to_time_t(clock::now());
 
         std::tm tm{};
 #ifndef WIN32
