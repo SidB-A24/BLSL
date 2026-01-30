@@ -81,6 +81,12 @@ namespace BLSL
 
 
 
+
+
+}
+
+namespace BLSVM
+{
     namespace Bytecode
     {
         instruction_t make_instruction(opcode_t opcode, operand_t a, operand_t b, operand_t c, flag_t flags)
@@ -106,7 +112,4 @@ namespace BLSL
             operand |= (value << OPND_T_SHIFT) & OPND_TYPE_MASK;
         }
     }
-
-
-
 }

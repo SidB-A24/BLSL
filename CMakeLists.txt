@@ -13,7 +13,9 @@ add_executable(BLSLang src/main.cpp
         src/headers/runtime/operator.h
         src/headers/intermediate/parser.h
         src/headers/runtime/vm.h
+        src/headers/runtime/stack.h
         src/headers/runtime/arena.h
+        src/headers/err/err.h
         src/headers/intermediate/astnodes.h
         src/headers/intermediate/astnodes.h
         src/headers/intermediate/compiler.h
@@ -28,8 +30,8 @@ add_executable(BLSLang src/main.cpp
         src/implementations/runtime/arena.cpp
         src/implementations/runtime/operator.cpp
         src/implementations/intermediate/astnodes.cpp
-        src/headers/err/err.h
         src/implementations/err/err.cpp
+        src/implementations/runtime/stack.cpp
 
 
 )

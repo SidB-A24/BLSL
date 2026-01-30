@@ -7,7 +7,7 @@
 
 #ifndef BLSLANG_BLSBYC_H
 #define BLSLANG_BLSBYC_H
-namespace BLSL
+namespace BLSVM
 {
     namespace Bytecode
     {
@@ -44,7 +44,7 @@ namespace BLSL
             CLING,              // This will tell a register to cling to a value from the stack/heap
             JUMP,
 
-            ARG_DENOTE,
+            ARG_DENOTE,         // This will denote a register as an argument to be used in the current call frame.
 
         };
 
@@ -64,5 +64,7 @@ namespace BLSL
         inline void set_register_flag(operand_t& operand, bool value);              // Sets the register flag in the operand.
 
     }
+
+    using byte_t = uint8_t;
 }
 #endif //BLSLANG_BLSBYC_H
