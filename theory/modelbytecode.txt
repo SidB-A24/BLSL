@@ -1,0 +1,12 @@
+#section: literals //8 bit code for pre-processor to read
+[size] //64 bit Count of how many literals
+[size][data] //64bit + n byte data for literals
+[size][data] //64bit + n byte data for literals
+[size][data] //64bit + n byte data for literals
+...
+#section: instructions //8 bit code for pre-processor to read
+[opcode][operanda][operandb][operandc][flags] //64 bit instruction
+[opcode][operanda][operandb][operandc][flags] //64 bit instruction
+[opcode][operanda][operandb][operandc][flags] //64 bit instruction
+...
+

@@ -13,7 +13,7 @@ add_executable(BLSLang src/main.cpp
         src/headers/runtime/operator.h
         src/headers/intermediate/parser.h
         src/headers/runtime/vm.h
-        src/headers/runtime/stack.h
+        src/headers/runtime/mem.h
         src/headers/runtime/arena.h
         src/headers/err/err.h
         src/headers/intermediate/astnodes.h
@@ -31,7 +31,7 @@ add_executable(BLSLang src/main.cpp
         src/implementations/runtime/operator.cpp
         src/implementations/intermediate/astnodes.cpp
         src/implementations/err/err.cpp
-        src/implementations/runtime/stack.cpp
+        src/implementations/runtime/mem.cpp
 
 
 )

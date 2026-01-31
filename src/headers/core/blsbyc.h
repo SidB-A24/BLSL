@@ -9,12 +9,22 @@
 #define BLSLANG_BLSBYC_H
 namespace BLSVM
 {
+
+    using byte_t = uint8_t;
+
     namespace Bytecode
     {
         using instruction_t = uint64_t;
         using opcode_t = uint8_t;
         using operand_t = uint16_t;
         using flag_t = uint8_t;
+
+        struct Instruction
+        {
+            opcode_t opcode;
+            operand_t a,b,c;
+            flag_t flags;
+        };
 
         inline constexpr instruction_t OPCODE_MASK = 0xFF00000000000000;
         inline constexpr instruction_t OPND_A_MASK = 0x00FFFF0000000000;
@@ -78,6 +88,15 @@ namespace BLSVM
 
     }
 
-    using byte_t = uint8_t;
+
+    namespace Bytecode
+    {
+        struct ConstEntry
+        {
+            size_t size;                                                            // Printed out as sizeof(size_t) characters followed by size characters.
+            byte_t* data;
+        };
+    }
+
 }
 #endif //BLSLANG_BLSBYC_H
