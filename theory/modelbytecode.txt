@@ -1,5 +1,6 @@
 #section: compileTimeSizes //8 bit code
-[size] //64 bit size_t
+[size] //64 bit size_t denoting number of compile time sizes
+[size] //64 bit size_t size
 [size]
 ...
 #section: literals //8 bit code for pre-processor to read

@@ -88,6 +88,7 @@ namespace BLSVM
         ptrdiff_t  memoryOffset = 0;
         size_t literalCount;
         inputStream.read(reinterpret_cast<char*>(&literalCount), sizeof(literalCount));
+        _elementOffsets.reserve(literalCount);
 
         for (size_t i = 0; i < literalCount; i++)
         {
@@ -101,6 +102,33 @@ namespace BLSVM
             if (!inputStream.read(reinterpret_cast<char*>(_memory.data() + memoryOffset), static_cast<std::streamsize>(literalSize))) throw; //TODO THROW
 
             memoryOffset += static_cast<ptrdiff_t>(literalSize);
+        }
+    }
+
+    size_t CompileTimeSizePool::get_size(size_t elementIndex) const
+    {
+        if (elementIndex > _data.size()) throw std::runtime_error("VM::CompileTimeSizePool: invalid element index"); //TODO THROW
+
+        return _data[elementIndex];
+    }
+
+    CompileTimeSizePool::CompileTimeSizePool(std::istream &inputStream)
+    {
+        defer_load_csz(inputStream);
+    }
+
+    void CompileTimeSizePool::defer_load_csz(std::istream &inputStream)
+    {
+        size_t sizeCount;
+        inputStream.read(reinterpret_cast<char*>(&sizeCount), sizeof(sizeCount));
+        _data.reserve(sizeCount);
+
+        for (size_t i = 0; i < sizeCount; i++)
+        {
+            size_t compileTimeSize;
+            if (!inputStream.read(reinterpret_cast<char*>(&compileTimeSize), sizeof(compileTimeSize))) throw; //TODO THROW
+
+            _data.emplace_back(compileTimeSize);
         }
     }
 }

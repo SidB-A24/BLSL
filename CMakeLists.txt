@@ -34,6 +34,8 @@ add_executable(BLSLang src/main.cpp
         src/implementations/runtime/mem.cpp
         src/implementations/debug/debug.cpp
         src/headers/debug/debug.h
+        src/headers/runtime/bootloader.h
+        src/implementations/runtime/bootloader.cpp
 
 
 )
