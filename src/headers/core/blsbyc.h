@@ -31,7 +31,8 @@ namespace BLSVM
 
         enum class Section: uint8_t
         {
-            LITERALS = 0,
+            COMPILE_TIME_SIZES,
+            LITERALS,
             INSTRUCTIONS,
         };
 
