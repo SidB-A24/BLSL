@@ -4,13 +4,9 @@
 
 #include "../../headers/debug/debug.h"
 
-void DEBUG::write_instruction_to_stream(BLSVM::Bytecode::Instruction instruction, std::ostream& output)
+void DEBUG::write_instruction_to_stream(BLSVM::Bytecode::instruction_t instruction, std::ostream& output)
 {
-    output.write(reinterpret_cast<char*>(&instruction.opcode), sizeof(BLSVM::Bytecode::opcode_t));
-    output.write(reinterpret_cast<char*>(&instruction.a), sizeof(BLSVM::Bytecode::operand_t));
-    output.write(reinterpret_cast<char*>(&instruction.b), sizeof(BLSVM::Bytecode::operand_t));
-    output.write(reinterpret_cast<char*>(&instruction.c), sizeof(BLSVM::Bytecode::operand_t));
-    output.write(reinterpret_cast<char*>(&instruction.flags),sizeof(BLSVM::Bytecode::flag_t));
+    output.write(reinterpret_cast<const char*>(&instruction), sizeof(BLSVM::Bytecode::instruction_t));
 }
 
 void DEBUG::write_literal_to_stream(size_t size, BLSVM::ubyte_t *data, std::ostream& output)

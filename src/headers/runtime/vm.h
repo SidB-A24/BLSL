@@ -6,6 +6,8 @@
 #ifndef BLSLANG_VM_H
 #define BLSLANG_VM_H
 
+#include <fstream>
+
 #include "mem.h"
 #include <iomanip>
 
@@ -79,7 +81,7 @@ namespace BLSVM
         std::vector<Bytecode::Instruction> _program;
 
     private:
-        [[nodiscard]] Register get_register(Bytecode::operand_t operand) const;
+        [[nodiscard]] Register& get_register(Bytecode::operand_t operand);
 
         [[nodiscard]] View view_register(Bytecode::operand_t operand) const;
         [[nodiscard]] View view_literal(Bytecode::operand_t operand) const;

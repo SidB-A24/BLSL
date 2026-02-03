@@ -19,10 +19,13 @@ void BLSVM::Bootloader::load() const
         {
             case Bytecode::Section::COMPILE_TIME_SIZES:
                 _vm->defer_load_csz(_inFile);
+                break;
             case Bytecode::Section::LITERALS:
                 _vm->defer_load_lp(_inFile);
+                break;
             case Bytecode::Section::INSTRUCTIONS:
                 _vm->defer_load_vm(_inFile);
+                break;
         }
     }
 

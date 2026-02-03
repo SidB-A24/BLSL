@@ -40,19 +40,19 @@ namespace BLSVM
     {
         reginfo_t reginfo = 0;
 
-        reginfo |= (type << REGISTER_TYPE_SHIFT) & REGISTER_TYPE_MASK;
-        reginfo |= (flags << REGISTER_FLAG_SHIFT) & REGISTER_FLAG_MASK;
+        reginfo |= (static_cast<reginfo_t>(type) << REGISTER_TYPE_SHIFT) & REGISTER_TYPE_MASK;
+        reginfo |= (static_cast<reginfo_t>(flags) << REGISTER_FLAG_SHIFT) & REGISTER_FLAG_MASK;
 
         return reginfo;
     }
 
 
-    Register VM::get_register(Bytecode::operand_t operand) const
+    Register& VM::get_register(Bytecode::operand_t operand)
     {
         size_t index = static_cast<size_t>(operand & (~Bytecode::OPND_TYPE_MASK));
 
         if (index >= REGISTER_COUNT) throw std::runtime_error("Invalid register"); // TODO THROW
-        if (Bytecode::is_register(operand)) throw std::runtime_error("Invalid register"); //TODO THROW
+        if (!Bytecode::is_register(operand)) throw std::runtime_error("Invalid register"); //TODO THROW
 
         return _registers[index];
     }
@@ -98,7 +98,7 @@ namespace BLSVM
         {
             for (size_t j = 0; j < info.count && i < REGISTER_COUNT; j++, i++)
             {
-                _registers[i].info = make_reginfo(static_cast<regtype_t>(info.type), j);
+                _registers[i].info = make_reginfo(static_cast<regtype_t>(info.type), info.flags);
             }
         }
 
@@ -165,23 +165,23 @@ namespace BLSVM
         if (!Bytecode::is_register(instruction.a)) throw std::runtime_error("Invalid operand for CLING"); //TODO THROW
         if (Bytecode::is_register(instruction.b)) throw std::runtime_error("Invalid operand for CLING"); //TODO THROW
 
-        auto dest = get_register(instruction.a);
+        auto& dest = get_register(instruction.a);
 
-        if (!(dest.info & REG_FLAG_WRITABLE)) throw std::runtime_error("Invalid operand for CLING"); // TODO THROW
+        if (!((dest.info & REGISTER_FLAG_MASK) & REG_FLAG_WRITABLE)) throw std::runtime_error("Invalid operand for CLING"); // TODO THROW
 
         size_t stackIndex = static_cast<size_t>(instruction.b & (~Bytecode::OPND_TYPE_MASK));
 
         dest.loc = Stack::get_ptr(stackIndex);
         dest.size = Stack::get_size(stackIndex);
+        dest.size;
     }
 
     void VM::_operation_DEBUG_DUMP(Bytecode::Instruction instruction)
     {
         View view = view_operand(instruction.a);
-        for (size_t i; i < view.size; i++)
+        for (size_t i = 0; i < view.size; i++)
         {
-            OutputStream << std::ios::binary << view.loc[i];
+            OutputStream << std::hex << std::setw(2) << std::setfill('0') << static_cast<unsigned>(view.loc[i]) << ' ';
         }
-        OutputStream << std::resetiosflags(std::ios::binary) << std::endl;
     }
 }

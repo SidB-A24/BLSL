@@ -9,6 +9,7 @@
 #include "headers/log/log.h"
 
 #include "headers/debug/debug.h"
+#include "headers/runtime/bootloader.h"
 
 int main()
 {
@@ -54,8 +55,11 @@ int main()
     literalCount = 2;
     bytecodeFile.write(reinterpret_cast<char*>(&literalCount), sizeof(size_t));
 
+    //BLSVM::ubyte_t data1[2] = {0xFF, 0xFF};
+    //BLSVM::ubyte_t data2[4] = {0xFF, 0xFF, 0xFF, 0xFF};
     BLSVM::ubyte_t data1[2] = {0xFF, 0xFF};
     BLSVM::ubyte_t data2[4] = {0xFF, 0xFF, 0xFF, 0xFF};
+
     DEBUG::write_literal_to_stream(2, data1, bytecodeFile);
     DEBUG::write_literal_to_stream(4, data2, bytecodeFile);
 
@@ -66,13 +70,13 @@ int main()
 
     BLSVM::Bytecode::opcode_t opcode = static_cast<BLSVM::Bytecode::opcode_t>(BLSVM::Bytecode::OpCode::ALLOC_STACK);
 
-    BLSVM::Bytecode::operand_t operandA = 0b1000'0000'0000'0001;
-    BLSVM::Bytecode::operand_t operandB = 0b1000'0000'0000'0000;
-    BLSVM::Bytecode::operand_t operandC = 0b0000'0000'1000'0000;
+    BLSVM::Bytecode::operand_t operandA = 0b0000'0000'0000'0001;
+    BLSVM::Bytecode::operand_t operandB = 0b0000'0000'0000'0000;
+    BLSVM::Bytecode::operand_t operandC = 0b1000'0000'1000'0000;
 
-    BLSVM::Bytecode::Instruction instruction = BLSVM::Bytecode::decode_instruction(BLSVM::Bytecode::make_instruction(
-        opcode, operandC, operandB
-    ));
+    auto instruction = BLSVM::Bytecode::make_instruction(
+        opcode, 0
+    );
 
     DEBUG::write_instruction_to_stream(instruction, bytecodeFile);
 
@@ -80,9 +84,9 @@ int main()
 
     opcode = static_cast<BLSVM::Bytecode::opcode_t>(BLSVM::Bytecode::OpCode::CLING_STACK);
 
-    instruction = BLSVM::Bytecode::decode_instruction(BLSVM::Bytecode::make_instruction(
-        opcode, operandC
-    ));
+    instruction = BLSVM::Bytecode::make_instruction(
+        opcode, operandC, 0
+    );
 
     DEBUG::write_instruction_to_stream(instruction, bytecodeFile);
 
@@ -91,20 +95,27 @@ int main()
 
     opcode = static_cast<BLSVM::Bytecode::opcode_t>(BLSVM::Bytecode::OpCode::UNSIGNED_ADD);
 
-    instruction = BLSVM::Bytecode::decode_instruction(BLSVM::Bytecode::make_instruction(
+    instruction = BLSVM::Bytecode::make_instruction(
         opcode, operandA, operandB, operandC
-    ));
+    );
     DEBUG::write_instruction_to_stream(instruction, bytecodeFile);
 
     //Dumping the result buffer to standard out
 
     opcode = static_cast<BLSVM::Bytecode::opcode_t>(BLSVM::Bytecode::OpCode::DEBUG_DUMP);
 
-    instruction = BLSVM::Bytecode::decode_instruction(BLSVM::Bytecode::make_instruction(
+    instruction = BLSVM::Bytecode::make_instruction(
         opcode, operandC
-    ));
+    );
     DEBUG::write_instruction_to_stream(instruction, bytecodeFile);
 
     bytecodeFile.close();
+
+    std::ifstream inputFile("../samples/out.blsbyc", std::ios::binary);
+    BLSVM::Bootloader bootloader{inputFile};
+
+    bootloader.load();
+    bootloader.boot();
+
 }
 
