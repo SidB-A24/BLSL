@@ -161,6 +161,32 @@ namespace BLSVM
     }
 
 
-
+    const std::vector<RegisterInfo> REGISTER_INFO = {
+        {
+            RegisterType::INTERNAL,
+            RegisterFlag::REG_FLAG_SPECIAL_WRITEABLE,
+            16
+        },
+        {
+            RegisterType::ARGS,
+            RegisterFlag::REG_FLAG_PRE_CALL_WRITABLE,
+            32
+        },
+        {
+            RegisterType::RETURNS,
+            RegisterFlag::REG_FLAG_POST_CALL_WRITEABLE,
+            32
+        },
+        {
+            RegisterType::SCI,
+            RegisterFlag::REG_FLAG_WRITABLE,
+            64
+        },
+        {
+            RegisterType::GENERAL,
+            RegisterFlag::REG_FLAG_WRITABLE,
+            112
+        }
+    };
 
 }
