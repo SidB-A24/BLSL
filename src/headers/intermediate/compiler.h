@@ -55,7 +55,7 @@ namespace BLSL
         size_t _virtualRegisterIndex;
         std::unordered_map<size_t, size_t> _registerLifetimes;                             // Register Index, Instruction index of last use.
 
-         Precursor::PrecursorBuffer_t _precursorBuffer;
+        Precursor::PrecursorBuffer_t _precursorBuffer;
 
         std::unordered_map<std::string, std::pair<size_t, size_t>> _variableMap;           // Identifier, {size, index}
         size_t _variableIndex;
@@ -72,6 +72,11 @@ namespace BLSL
 
     public:
         Flattener();
+
+        Precursor::PrecursorBuffer_t get_precursor_buffer() {return std::move(_precursorBuffer);}
+        std::unordered_map<std::string, size_t> get_literal_map() {return _literalMap;}                             // Yes these are expensive but they're not recurring calls so its okay.
+        std::unordered_map<size_t, size_t> get_compile_time_size_map() {return _compileTimeSizes;}                  // Same as above
+
     public:
         void visit(ASTNode::Alloc *node) override;
         void visit(ASTNode::BinaryOperator *node) override;
@@ -99,7 +104,20 @@ namespace BLSL
 
     };
 
+    class Encoder
+    {
+    private:
+        Precursor::PrecursorBuffer_t _precursorBuffer;
+        std::unordered_map<size_t, size_t> _compileTimeSizes;
+        std::unordered_map<std::string, size_t> _literalMap;
 
+        std::ostream& _outStream;
+
+    public:
+        Encoder(Precursor::PrecursorBuffer_t precursorBuffer, std::unordered_map<std::string, size_t> literalMap, std::unordered_map<size_t, size_t> compileTimeSizes, std::ostream& outStream);
+
+        std::ostream& write_out();
+    };
 }
 
 

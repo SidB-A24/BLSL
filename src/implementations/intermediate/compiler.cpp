@@ -31,6 +31,9 @@ BLSL::Precursor::Operand BLSL::Flattener::_traverse_expression(ASTNode::Node* no
         _registerLifetimes[_virtualRegisterIndex-1] = _precursorBuffer->size();
         return Precursor::Operand{Precursor::OperandType::VIRTUAL_REGISTER_GENERAL, _virtualRegisterIndex-1};
     }
+
+
+    return Precursor::Operand{}; //This should never happen;
 }
 
 size_t BLSL::Flattener::_cling_variable(ASTNode::Variable *node)
@@ -161,6 +164,13 @@ void BLSL::RegisterPass::assign_real_registers()
         _mutate_precursor(instruction.b, i);
         _mutate_precursor(instruction.c, i);
     }
+
+}
+
+BLSL::Encoder::Encoder(Precursor::PrecursorBuffer_t precursorBuffer, std::unordered_map<std::string, size_t> literalMap,
+    std::unordered_map<size_t, size_t> compileTimeSizes, std::ostream &outStream)
+: _precursorBuffer(std::move(precursorBuffer)), _compileTimeSizes(std::move(compileTimeSizes)), _literalMap(std::move(literalMap)), _outStream(outStream)
+{
 
 }
 
