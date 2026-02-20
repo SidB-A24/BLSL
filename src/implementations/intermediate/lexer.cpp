@@ -178,6 +178,9 @@ std::optional<BLSL::Token> BLSL::Lexer::_lex_number()
             ch = _source.substr(_carat, 1);
         }
 
+        //padding. For example 101 becomes 00000101. 11101110 remains 11101110
+        token.value->insert(token.value->begin(), token.value->size() % 8, '0');
+
         return token;
     }
 
@@ -193,6 +196,9 @@ std::optional<BLSL::Token> BLSL::Lexer::_lex_number()
             _step();
             ch = _source.substr(_carat, 1);
         }
+
+        //padding. For example F becomes 0F. AF remains AF.
+        token.value->insert(token.value->begin(),token.value->size() % 2,  '0');
 
         return token;
     }

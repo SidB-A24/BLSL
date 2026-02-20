@@ -200,8 +200,51 @@ void BLSL::Encoder::write_size_t(size_t value) const
 
 std::vector<BLSVM::ubyte_t> BLSL::Encoder::encode_literal(const std::string &value, LiteralType type)
 {
-    //TODO
-    return {};
+    std::vector<BLSVM::ubyte_t> literal;
+    switch (type)
+    {
+        case LiteralType::INT:
+            //TODO INT
+            break;
+
+        case LiteralType::BIN:
+            literal.reserve(value.length()/8);
+            for (size_t i = 0; i < value.length(); i += 8)
+            {
+                BLSVM::ubyte_t ubyte = 0;
+                for (size_t j = 0; j < 8; ++j)
+                {
+                    ubyte |= static_cast<BLSVM::ubyte_t>(value[i+j] == '1' ? 1 : 0) << (7-j);
+                }
+                literal.push_back(ubyte);
+            }
+            break;
+
+        case LiteralType::HEX:
+            literal.reserve(value.length()/2);
+            for (size_t i = 0; i < value.length(); i += 2)
+            {
+                BLSVM::ubyte_t ubyte = 0;
+                auto subs = value.substr(i, 2);
+                ubyte = static_cast<BLSVM::ubyte_t>(strtol(subs.data(), nullptr, 16));
+                literal.push_back(ubyte);
+            }
+            break;
+
+        case LiteralType::SCI:
+            //TODO SCI
+            break;
+
+        case LiteralType::ASCII:
+            literal.reserve(value.length());
+            for (const char c : value)
+            {
+                literal.push_back(static_cast<BLSVM::ubyte_t>(c));
+            }
+            break;
+    }
+
+    return literal;
 }
 
 BLSL::Encoder::Encoder(Precursor::PrecursorBuffer_t precursorBuffer, Precursor::LiteralMap_t literalMap,
@@ -230,7 +273,7 @@ std::ostream & BLSL::Encoder::write_out() const
     {
         std::vector<BLSVM::ubyte_t> encodedLiteral = encode_literal(literal.first, literal.second.second);
         write_val<size_t>(encodedLiteral.size());
-        for (auto byte: encodedLiteral)
+        for (const auto byte: encodedLiteral)
         {
             write_val<BLSVM::ubyte_t>(byte);
         }
