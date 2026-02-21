@@ -198,13 +198,37 @@ void BLSL::Encoder::write_size_t(size_t value) const
     _outStream.write(reinterpret_cast<const char*>(&value), sizeof(size_t));
 }
 
-std::vector<BLSVM::ubyte_t> BLSL::Encoder::encode_literal(const std::string &value, LiteralType type)
+std::vector<BLSVM::ubyte_t> BLSL::Encoder::encode_literal(std::string value, LiteralType type)
 {
     std::vector<BLSVM::ubyte_t> literal;
     switch (type)
     {
         case LiteralType::INT:
-            //TODO INT
+            while (value != "0")
+            {
+                int remainder = 0;
+                std::string next;
+
+                for (const char digit : value)
+                {
+                    int dividend = remainder * 10 + (digit - '0');
+                    int quotient = dividend / 2;
+
+                    remainder = dividend % 2;
+
+                    if (!next.empty() || quotient != 0)                                                                 // Till we remove all the leading stuff.
+                    {
+                        next.push_back(static_cast<char>('0' + quotient));
+                    }
+                }
+
+                literal.push_back(static_cast<BLSVM::ubyte_t>(remainder));
+
+                if (next.empty()) value = "0";
+                else value = next;
+            }
+
+            std::reverse(literal.begin(), literal.end());                                                       // Long division yields little endian.
             break;
 
         case LiteralType::BIN:

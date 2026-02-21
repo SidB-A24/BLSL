@@ -125,7 +125,7 @@ namespace BLSL
         template <typename T> void write_val(T val) const;
 
 
-        static std::vector<BLSVM::ubyte_t> encode_literal(const std::string& value, LiteralType type);
+        static std::vector<BLSVM::ubyte_t> encode_literal(std::string value, LiteralType type);
 
     public:
         Encoder(Precursor::PrecursorBuffer_t precursorBuffer, Precursor::LiteralMap_t literalMap,
