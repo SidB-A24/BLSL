@@ -48,27 +48,34 @@ namespace BLSL
         BLSVM::Bytecode::operand_t to_primitive_operand(Operand operand);
 
         using PrecursorBuffer_t = std::unique_ptr<std::vector<Instruction>>;
-        using LiteralMap_t = std::unordered_map<std::string, std::pair<size_t, LiteralType>>;
-        using VariableMap_t = std::unordered_map<std::string, std::pair<size_t, size_t>>;
-        using CompileTimeSizeMap_t = std::unordered_map<size_t, size_t>;
+        using RegisterLifetimeBuffer_t = std::unordered_map<size_t, size_t>;
+        using LiteralMap_t = std::unordered_map<std::string, std::pair<size_t, LiteralType>>;                           // Literal value, {sz in bytes, type of literal}
+        using VariableMap_t = std::unordered_map<std::string, std::pair<size_t, size_t>>;                               // Identifier, {size, index}
+        using CompileTimeSizeMap_t = std::unordered_map<size_t, size_t>;                                                // csz, index
 
     }
 
+    /*
+     * This flattens the AST Into a vector of precursor objects, which are essentially representatives of instructions.
+     * It assigns virtual registers to store result of sub expressions, for further computation.
+     * Assigns virtual registers for variables and inserts CLING statements before v register usage.
+     * Creates maps of all the literals and compile time sizes,
+     */
     class Flattener : public ASTNode::Visitor
     {
     private:
         size_t _virtualRegisterIndex;
-        std::unordered_map<size_t, size_t> _registerLifetimes;                                                          // Register Index, Instruction index of last use.
+        Precursor::RegisterLifetimeBuffer_t _virtualRegisterLifetimes;                                                          // Register Index, Instruction index of last use.
 
         Precursor::PrecursorBuffer_t _precursorBuffer;
 
-        Precursor::VariableMap_t _variableMap;                                                                          // Identifier, {size, index}
+        Precursor::VariableMap_t _variableMap;
         size_t _variableIndex;
 
-        Precursor::LiteralMap_t _literalMap;                                                                            // Literal, index
+        Precursor::LiteralMap_t _literalMap;
         size_t _literalIndex;
 
-        Precursor::CompileTimeSizeMap_t _compileTimeSizes;                                                              // csz, index
+        Precursor::CompileTimeSizeMap_t _compileTimeSizes;
         size_t _compileTimeSizeIndex;
 
     private:
@@ -88,10 +95,15 @@ namespace BLSL
 
     };
 
+    /*
+     * Replaces all virtual registers with real register indices.
+     * Tracks lifetimes of real registers for re-use (that's the whole point)
+     * It does the above by mutating the precursor buffer.
+     */
     class RegisterPass
     {
     private:
-        std::unordered_map<size_t, size_t> _virtualRegisterLifetimes;                                                   // vRegister Index, Instruction index of last use.
+        Precursor::RegisterLifetimeBuffer_t _virtualRegisterLifetimes;                                                   // vRegister Index, Instruction index of last use.
         Precursor::PrecursorBuffer_t _precursorBuffer;
 
         std::queue<size_t> _freeGeneralRegisters;
@@ -109,6 +121,11 @@ namespace BLSL
 
     };
 
+
+    /*
+     * Encodes precursor objects into raw binary instructions, into the out stream.
+     * Encodes, csz, literals, instructions, essentially composes the bytecode file.
+     */
     class Encoder
     {
     private:

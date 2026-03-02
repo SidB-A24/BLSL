@@ -39,7 +39,7 @@ BLSL::Precursor::Operand BLSL::Flattener::_traverse_expression(ASTNode::Node* no
     if (auto binaryOperation = dynamic_cast<ASTNode::BinaryOperator*>(node))
     {
         visit(binaryOperation);
-        _registerLifetimes[_virtualRegisterIndex-1] = _precursorBuffer->size();
+        _virtualRegisterLifetimes[_virtualRegisterIndex-1] = _precursorBuffer->size();
         return Precursor::Operand{Precursor::OperandType::VIRTUAL_REGISTER_GENERAL, _virtualRegisterIndex-1};
     }
 
@@ -58,7 +58,7 @@ size_t BLSL::Flattener::_cling_variable(const ASTNode::Variable *node)
 
     _precursorBuffer->emplace_back(instruction);
 
-    _registerLifetimes.emplace(_virtualRegisterIndex, _precursorBuffer->size()-1);
+    _virtualRegisterLifetimes.emplace(_virtualRegisterIndex, _precursorBuffer->size()-1);
     return _virtualRegisterIndex++;
 }
 
@@ -91,7 +91,7 @@ void BLSL::Flattener::visit(ASTNode::BinaryOperator *node)
 
     //NOTE THIS MUST BE THE LAST VREG ALLOCATION IN THIS FUNCTION
     instruction.c = Precursor::Operand{Precursor::OperandType::VIRTUAL_REGISTER_GENERAL, _virtualRegisterIndex};
-    _registerLifetimes.emplace(_virtualRegisterIndex++, _precursorBuffer->size()-1);
+    _virtualRegisterLifetimes.emplace(_virtualRegisterIndex++, _precursorBuffer->size()-1);
 
     _precursorBuffer->emplace_back(instruction);
 }

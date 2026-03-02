@@ -23,24 +23,43 @@ namespace BLSL
         Token _next();
 
 
-        std::expected<OperatorType, Token> _peek_operator() const;
+        [[deprecated]] std::expected<OperatorType, Token> _peek_operator() const;
 
-        std::expected<Node_t, Token> _get_atom();
-        std::expected<std::string, Token> _get_identifier();
-        std::expected<Token, Token> _get_literal();
-        std::expected<std::unique_ptr<ASTNode::BinaryOperator>, Token> _get_operator();
+        [[deprecated]] std::expected<Node_t, Token> _get_atom();
+        [[deprecated]] std::expected<std::string, Token> _get_identifier();
+        [[deprecated]] std::expected<Token, Token> _get_literal();
+        [[deprecated]] std::expected<std::unique_ptr<ASTNode::BinaryOperator>, Token> _get_operator();
 
-        bool _match_punctuator(PunctuatorType pType) const;
-        bool _match_comparator(ComparatorType cType) const;
-        bool _match_keyword(KeywordType kType) const;
+        [[deprecated]] bool _match_punctuator(PunctuatorType pType) const;
+        [[deprecated]] bool _match_comparator(ComparatorType cType) const;
+        [[deprecated]] bool _match_keyword(KeywordType kType) const;
 
-        void _consume_punctuator(PunctuatorType pType);
-        void _consume_operator(OperatorType oType);
-        void _consume_comparator(ComparatorType cType);
-        void _consume_keyword(KeywordType kType);
+        [[deprecated]] void _consume_punctuator(PunctuatorType pType);
+        [[deprecated]] void _consume_operator(OperatorType oType);
+        [[deprecated]] void _consume_comparator(ComparatorType cType);
+        [[deprecated]] void _consume_keyword(KeywordType kType);
 
         size_t _consume_compile_time_size();
         std::vector<size_t> _consume_compile_time_size_list();
+
+    private:
+        Node_t _get_atom_consume();
+        std::string _get_identifier_consume();
+        Token _get_literal_consume();
+        std::unique_ptr<ASTNode::BinaryOperator> _get_operator_consume();
+
+        template <BLSLEnum EnumTy>
+        bool _match(EnumTy required)
+        {
+
+        }
+
+        template <BLSLEnum EnumTy>
+        bool _consume(EnumTy required)
+        {
+
+        }
+
 
     private:
 

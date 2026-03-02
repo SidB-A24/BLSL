@@ -98,6 +98,15 @@ namespace BLSL
         ASCII
     };
 
+    template<typename T>
+    concept BLSLEnum =
+        std::same_as<T, TokenType> ||
+    std::same_as<T, OperatorType>   ||
+    std::same_as<T, PunctuatorType> ||
+    std::same_as<T, KeywordType> ||
+    std::same_as<T, ComparatorType> ||
+    std::same_as<T, LiteralType>;
+
 
 
 }
