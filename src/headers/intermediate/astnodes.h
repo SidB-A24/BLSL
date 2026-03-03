@@ -39,7 +39,7 @@ namespace BLSL
             virtual void invite(Visitor& visitor) = 0;
         };
 
-        struct BodyNode : Node
+        struct BodyNode final : Node
         {
             std::vector<Node_t> nodes;
 
@@ -50,7 +50,7 @@ namespace BLSL
          *  ATOMS
          */
 
-        struct Literal : public Node
+        struct Literal final : public Node
         {
             LiteralType type;
             std::string value;
@@ -58,7 +58,7 @@ namespace BLSL
             void invite(Visitor& visitor) override;
         };
 
-        struct Variable : public Node
+        struct Variable final : public Node
         {
             std::string identifier;
 
@@ -75,14 +75,14 @@ namespace BLSL
             OperatorType type;
         };
 
-        struct UnaryOperator : public Operator
+        struct UnaryOperator final : public Operator
         {
             Node_t right;
 
             void invite(Visitor& visitor) override;
         };
 
-        struct BinaryOperator : public Operator
+        struct BinaryOperator final : public Operator
         {
             Node_t left;
             Node_t right;
@@ -95,14 +95,14 @@ namespace BLSL
          *  STATEMENTS
          */
 
-        struct MemInit : public Node
+        struct MemInit final : public Node
         {
             size_t size;
 
             void invite(Visitor& visitor) override;
         };
 
-        struct Alloc : public Node
+        struct Alloc final : public Node
         {
             size_t size;
             std::string identifier;
@@ -110,7 +110,7 @@ namespace BLSL
             void invite(Visitor& visitor) override;
         };
 
-        struct Func : public Node
+        struct Func final : public Node
         {
             std::string identifier;
             size_t returnSize;
@@ -120,7 +120,7 @@ namespace BLSL
             void invite(Visitor& visitor) override;
         };
 
-        struct If : public Node
+        struct If final : public Node
         {
             Node_t condition;
             Node_t body;
@@ -129,7 +129,7 @@ namespace BLSL
             void invite(Visitor& visitor) override;
         };
 
-        struct For : public Node
+        struct For final : public Node
         {
             std::optional<Node_t> initialize;
             std::optional<Node_t> condition;
@@ -140,7 +140,7 @@ namespace BLSL
             void invite(Visitor& visitor) override;
         };
 
-        struct While : public Node
+        struct While final : public Node
         {
             Node_t condition;
             Node_t body;
@@ -183,7 +183,7 @@ namespace BLSL
             virtual void visit(Alloc* node) = 0;
         };
 
-        class PrintVisitor : public Visitor
+        class PrintVisitor final : public Visitor
         {
         private:
             std::string _outPath;
@@ -200,7 +200,7 @@ namespace BLSL
         public:
             PrintVisitor() = default;
             explicit PrintVisitor(std::string  outPath);
-            ~PrintVisitor();
+            ~PrintVisitor() override;
 
         public:
             void visit(BodyNode* node) override;
