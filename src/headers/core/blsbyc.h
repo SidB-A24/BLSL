@@ -74,6 +74,8 @@ namespace BLSVM
         {
             EMPTY = 0,
 
+            SET,                                                                                                        // For assignment of a variable to an r-value;
+
             UNSIGNED_ADD,
             UNSIGNED_SUB,
             UNSIGNED_MUL,

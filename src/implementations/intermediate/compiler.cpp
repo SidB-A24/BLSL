@@ -9,7 +9,8 @@
 #include "../../headers/runtime/vm.h"
 
 static const std::unordered_map<BLSL::OperatorType, BLSVM::Bytecode::OpCode> OPERATOR_OPCODE_MAP = {
-    {BLSL::OperatorType::UNSIGNED_ADD, BLSVM::Bytecode::OpCode::UNSIGNED_ADD}
+    {BLSL::OperatorType::UNSIGNED_ADD, BLSVM::Bytecode::OpCode::UNSIGNED_ADD},
+    {BLSL::OperatorType::ASSIGN_EQUATE, BLSVM::Bytecode::OpCode::SET}
 }; //TODO COMPLETE
 
 BLSVM::Bytecode::operand_t BLSL::Precursor::to_primitive_operand(Operand operand)
@@ -64,7 +65,10 @@ size_t BLSL::Flattener::_cling_variable(const ASTNode::Variable *node)
 
 BLSL::Flattener::Flattener()
     : _virtualRegisterIndex(0), _variableIndex(0), _literalIndex(0), _compileTimeSizeIndex(0)
-{}
+{
+    Precursor::PrecursorBuffer_t precursorBuffer;
+    _precursorBuffer = std::make_unique<Precursor::PrecursorBuffer_t>(precursorBuffer);
+}
 
 void BLSL::Flattener::visit(ASTNode::Alloc *node)
 {
@@ -76,6 +80,10 @@ void BLSL::Flattener::visit(ASTNode::Alloc *node)
         BLSVM::Bytecode::OpCode::ALLOC_STACK,
         {Precursor::OperandType::VARIABLE, _variableIndex++}
     };
+
+    if (!_compileTimeSizes.contains(node->size)) _compileTimeSizes.emplace(node->size, _compileTimeSizeIndex++);
+
+    instruction.b = Precursor::Operand{Precursor::OperandType::COMPILE_TIME_SIZE, _compileTimeSizes.at(node->size)};
 
     _precursorBuffer->emplace_back(instruction);
 }
@@ -154,7 +162,7 @@ void BLSL::RegisterPass::_mutate_precursor(Precursor::Operand &op, size_t instru
     }
 }
 
-BLSL::RegisterPass::RegisterPass(Precursor::PrecursorBuffer_t precursorBuffer, std::unordered_map<size_t, size_t> registerLifetimes)
+BLSL::RegisterPass::RegisterPass(Precursor::PrecursorBufferUP_t precursorBuffer, std::unordered_map<size_t, size_t> registerLifetimes)
 : _virtualRegisterLifetimes(std::move(registerLifetimes)),
 _precursorBuffer(std::move(precursorBuffer))
 {
@@ -288,7 +296,7 @@ std::vector<BLSVM::ubyte_t> BLSL::Encoder::encode_literal(std::string value, Lit
     return literal;
 }
 
-BLSL::Encoder::Encoder(Precursor::PrecursorBuffer_t precursorBuffer, Precursor::LiteralMap_t literalMap,
+BLSL::Encoder::Encoder(Precursor::PrecursorBufferUP_t precursorBuffer, Precursor::LiteralMap_t literalMap,
                        Precursor::CompileTimeSizeMap_t compileTimeSizes, std::ostream &outStream)
 : _precursorBuffer(std::move(precursorBuffer)), _compileTimeSizes(std::move(compileTimeSizes)), _literalMap(std::move(literalMap)), _outStream(outStream)
 {

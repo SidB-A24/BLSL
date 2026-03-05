@@ -47,7 +47,8 @@ namespace BLSL
 
         BLSVM::Bytecode::operand_t to_primitive_operand(Operand operand);
 
-        using PrecursorBuffer_t = std::unique_ptr<std::vector<Instruction>>;
+        using PrecursorBuffer_t = std::vector<Instruction>;
+        using PrecursorBufferUP_t = std::unique_ptr<std::vector<Instruction>>;
         using RegisterLifetimeBuffer_t = std::unordered_map<size_t, size_t>;
         using LiteralMap_t = std::unordered_map<std::string, std::pair<size_t, LiteralType>>;                           // Literal value, {sz in bytes, type of literal}
         using VariableMap_t = std::unordered_map<std::string, std::pair<size_t, size_t>>;                               // Identifier, {size, index}
@@ -67,7 +68,7 @@ namespace BLSL
         size_t _virtualRegisterIndex;
         Precursor::RegisterLifetimeBuffer_t _virtualRegisterLifetimes;                                                          // Register Index, Instruction index of last use.
 
-        Precursor::PrecursorBuffer_t _precursorBuffer;
+        Precursor::PrecursorBufferUP_t _precursorBuffer;
 
         Precursor::VariableMap_t _variableMap;
         size_t _variableIndex;
@@ -85,7 +86,7 @@ namespace BLSL
     public:
         Flattener();
 
-        Precursor::PrecursorBuffer_t get_precursor_buffer() {return std::move(_precursorBuffer);}
+        Precursor::PrecursorBufferUP_t get_precursor_buffer() {return std::move(_precursorBuffer);}
         Precursor::LiteralMap_t get_literal_map() {return _literalMap;}                                              // Yes these are expensive, but they're not recurring calls so it's okay.
         Precursor::CompileTimeSizeMap_t get_compile_time_size_map() {return _compileTimeSizes;}                     // Same as above
 
@@ -115,7 +116,7 @@ namespace BLSL
     {
     private:
         Precursor::RegisterLifetimeBuffer_t _virtualRegisterLifetimes;                                                   // vRegister Index, Instruction index of last use.
-        Precursor::PrecursorBuffer_t _precursorBuffer;
+        Precursor::PrecursorBufferUP_t _precursorBuffer;
 
         std::queue<size_t> _freeGeneralRegisters;
         std::unordered_map<size_t, size_t> _assignedRegisters;                                                          // vreg index, real register index.
@@ -125,7 +126,7 @@ namespace BLSL
         auto _assign_register(Precursor::Operand op, size_t instructionIndex) -> void;
         void _mutate_precursor(Precursor::Operand& op, size_t instructionIndex) const;
     public:
-        RegisterPass(Precursor::PrecursorBuffer_t precursorBuffer, std::unordered_map<size_t, size_t> registerLifetimes);
+        RegisterPass(Precursor::PrecursorBufferUP_t precursorBuffer, std::unordered_map<size_t, size_t> registerLifetimes);
 
         void assign_real_registers();
 
@@ -140,7 +141,7 @@ namespace BLSL
     class Encoder
     {
     private:
-        Precursor::PrecursorBuffer_t _precursorBuffer;
+        Precursor::PrecursorBufferUP_t _precursorBuffer;
         Precursor::CompileTimeSizeMap_t _compileTimeSizes;
         Precursor::LiteralMap_t _literalMap;
 
@@ -156,7 +157,7 @@ namespace BLSL
         static std::vector<BLSVM::ubyte_t> encode_literal(std::string value, LiteralType type);
 
     public:
-        Encoder(Precursor::PrecursorBuffer_t precursorBuffer, Precursor::LiteralMap_t literalMap,
+        Encoder(Precursor::PrecursorBufferUP_t precursorBuffer, Precursor::LiteralMap_t literalMap,
                 Precursor::CompileTimeSizeMap_t compileTimeSizes, std::ostream &outStream);
 
         [[nodiscard]] std::ostream& write_out() const;

@@ -2,6 +2,7 @@
 
 #include <print>
 #include <format>
+#include <ranges>
 
 #include "headers/core/blsl.h"
 #include "headers/intermediate/lexer.h"
@@ -144,9 +145,25 @@ int main2()
     auto literal_map = flattener.get_literal_map();
     auto prec_buf = flattener.get_precursor_buffer();
 
-    for (auto [key, value] : csz_map)
+    std::cout << "\nCSZs: \n";
+    for (const auto& [key, value] : csz_map)
     {
         std::cout << key << ": " << value << "\n";
+    }
+    std::cout << "\nLiterals: \n";
+    for (const auto& [key, value] : literal_map)
+    {
+        std::cout << "val: " << key << " index: " << value.first << " tp: " << static_cast<int>(value.second) << "\n";
+    }
+
+    std::cout << "\nInstructions: \n";
+    for (const auto& prec : *prec_buf)
+    {
+        std::cout << "opcode: " << static_cast<int>(prec.opCode);
+        std::cout << "\n\t a: " << static_cast<int>(prec.a.type) << " idx: " << prec.a.index;
+        std::cout << "\n\t b: " << static_cast<int>(prec.b.type) << " idx: " << prec.b.index;
+        std::cout << "\n\t c: " << static_cast<int>(prec.c.type) << " idx: " << prec.c.index;
+        std::cout << "\n";
     }
 }
 
@@ -154,3 +171,8 @@ int main()
 {
     main2();
 }
+
+
+/*
+ *
+ */
