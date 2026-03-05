@@ -4,11 +4,14 @@
 
 #include "../../headers/core/blsbyc.h"
 #include "../../headers/core/blsl.h"
+#include "../../headers/intermediate/astnodes.h"
 
 namespace BLSL
 {
     const LexemeTable_t LEXEME_TABLE = {
         {TokenType::OPERATOR, {
+            {"=", OperatorType::ASSIGN_EQUATE},
+
             {"+", OperatorType::UNSIGNED_ADD},
             {"-", OperatorType::UNSIGNED_SUB},
             {"*", OperatorType::UNSIGNED_MUL},
@@ -74,6 +77,8 @@ namespace BLSL
         {OperatorType::BW_NOT, {120, 122}},
         {OperatorType::BW_AND, {110, 112}},
         {OperatorType::BW_OR, {100, 102}},
+
+        {OperatorType::ASSIGN_EQUATE, {0, 1000}}
     };
 
     const std::unordered_map<OperatorType, int> PREFIX_PRECEDENCE = {

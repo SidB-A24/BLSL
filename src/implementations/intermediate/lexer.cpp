@@ -75,6 +75,7 @@ std::optional<BLSL::Token> BLSL::Lexer::_lex_empty()
                 _step();
                 ch = _source.substr(_carat, 2);
             }
+            _step(2);
             continue;
         }
 

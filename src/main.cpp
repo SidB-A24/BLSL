@@ -9,9 +9,11 @@
 #include "headers/log/log.h"
 
 #include "headers/debug/debug.h"
+#include "headers/intermediate/compiler.h"
 #include "headers/runtime/bootloader.h"
 
-int main()
+
+int main1()
 {
     /*
     BLSL::Lexer lexer;
@@ -119,3 +121,36 @@ int main()
 
 }
 
+int main2()
+{
+    BLSL::Lexer lexer;
+    lexer.mount_source_from_file("../samples/comments.blsl");
+
+    //lexer.lex_to_file("../samples/out.blslex");
+
+    auto parser = BLSL::Parser(std::move(lexer.lex()));
+
+    auto root = parser.parse();
+
+    BLSL::ASTNode::PrintVisitor visitor;
+
+    root->invite(visitor);
+
+    BLSL::Flattener flattener;
+
+    root->invite(flattener);
+
+    auto csz_map = flattener.get_compile_time_size_map();
+    auto literal_map = flattener.get_literal_map();
+    auto prec_buf = flattener.get_precursor_buffer();
+
+    for (auto [key, value] : csz_map)
+    {
+        std::cout << key << ": " << value << "\n";
+    }
+}
+
+int main()
+{
+    main2();
+}

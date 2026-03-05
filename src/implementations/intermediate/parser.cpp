@@ -431,6 +431,7 @@ BLSL::Node_t BLSL::Parser::_parse_alloc()
 
     allocNode.identifier = _get_identifier_consume();
     allocNode.size = _consume_compile_time_size();
+    _consume(PunctuatorType::SEMICOLON);
 
     return std::make_unique<ASTNode::Alloc>(std::move(allocNode));
 }
@@ -441,17 +442,22 @@ BLSL::Node_t BLSL::Parser::_parse_expression(const int lowestPrecedence)
 
     if (_peek().type == TokenType::PUNCTUATOR)
     {
-        if (std::get<PunctuatorType>(_peek().subType) == PunctuatorType::LPAREN)
+        switch (std::get<PunctuatorType>(_peek().subType))
         {
-            _next();
+            case PunctuatorType::LPAREN:
+                _next();
 
-            LHS = _parse_expression();
+                LHS = _parse_expression();
 
-            _consume(PunctuatorType::RPAREN);
-        }
-        else
-        {
-            throw Error::UnexpectedToken(TokenType::PUNCTUATOR, _peek());
+                _consume(PunctuatorType::RPAREN);
+                break;
+            case PunctuatorType::SEMICOLON:
+            {
+                throw Error::UnexpectedToken(TokenType::IDENTIFIER, _peek());
+            }
+            default:
+                throw Error::UnexpectedToken(TokenType::PUNCTUATOR, _peek());
+                break;
         }
     }
     else if (_peek().type == TokenType::OPERATOR)
@@ -527,15 +533,20 @@ BLSL::Node_t BLSL::Parser::_parse_statement()
         BodyNode_t block = _parse_block();
         return block;
     }
+    auto debug_peek = _peek();
 
     switch (_peek().type)
     {
+        //When we have expressions such as a = 3 + 8;
+        case TokenType::IDENTIFIER:
+        {
+            return _parse_expression();
+        }
         case TokenType::KEYWORD:
             switch (std::get<KeywordType>(_peek().subType))
             {
             case KeywordType::IDENTIFIER_PLACEHOLDER:
-                //TODO THRow
-                throw;
+                throw Error::BadToken(_next());
 
             case KeywordType::FOR:
                 return _parse_for();
@@ -561,7 +572,7 @@ BLSL::Node_t BLSL::Parser::_parse_statement()
 
 
         default:
-            throw Error::BadToken(_next());
+            throw Error::UnexpectedToken(TokenType::KEYWORD, _next());
     }
 }
 
@@ -578,6 +589,22 @@ BLSL::Node_t BLSL::Parser::parse()
     while (_pos < _tokens->size())
     {
         //_parse_statement();
+        switch (_peek().type)
+        {
+            //When we have expressions such as a = 3 + 8;
+            case TokenType::PUNCTUATOR:
+                switch (std::get<PunctuatorType>(_peek().subType))
+                {
+                    case PunctuatorType::SEMICOLON:
+                        _next();
+                        continue;
+                    default:
+                        throw Error::UnexpectedToken(TokenType::KEYWORD, _next());
+                }
+            default:
+                break;
+        }
+
         bodyNode.nodes.emplace_back(_parse_statement());
     }
 

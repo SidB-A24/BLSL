@@ -26,6 +26,8 @@ namespace BLSL
 
     enum class OperatorType
     {
+        ASSIGN_EQUATE,
+
         UNSIGNED_ADD,
         UNSIGNED_SUB,
         UNSIGNED_DIV,
@@ -150,7 +152,7 @@ struct std::formatter<BLSL::Token> : std::formatter<std::string>
 {
     auto format(const BLSL::Token& tok, std::format_context& ctx) const
     {
-        int subTypeCode = std::visit(
+        const int subTypeCode = std::visit(
             [](auto x)
             {
                 return static_cast<int>(x);

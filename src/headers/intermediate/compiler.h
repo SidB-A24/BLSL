@@ -90,9 +90,20 @@ namespace BLSL
         Precursor::CompileTimeSizeMap_t get_compile_time_size_map() {return _compileTimeSizes;}                     // Same as above
 
     public:
-        void visit(ASTNode::Alloc *node) override;
-        void visit(ASTNode::BinaryOperator *node) override;
+        void visit(ASTNode::BodyNode* node) override;
 
+        void visit(ASTNode::BinaryOperator* node) override;
+        void visit(ASTNode::UnaryOperator* node) override;
+        void visit(ASTNode::Literal* node) override;
+        void visit(ASTNode::Variable* node) override;
+
+        void visit(ASTNode::Func* node) override;
+        void visit(ASTNode::For* node) override;
+        void visit(ASTNode::While* node) override;
+        void visit(ASTNode::If* node) override;
+
+        void visit(ASTNode::MemInit* node) override;
+        void visit(ASTNode::Alloc* node) override;
     };
 
     /*

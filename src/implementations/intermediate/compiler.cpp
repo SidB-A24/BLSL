@@ -80,6 +80,14 @@ void BLSL::Flattener::visit(ASTNode::Alloc *node)
     _precursorBuffer->emplace_back(instruction);
 }
 
+void BLSL::Flattener::visit(ASTNode::BodyNode *node)
+{
+    for (const auto& subNode : node->nodes)
+    {
+        subNode->invite(*this);
+    }
+}
+
 void BLSL::Flattener::visit(ASTNode::BinaryOperator *node)
 {
     Precursor::Instruction instruction = {
@@ -95,6 +103,15 @@ void BLSL::Flattener::visit(ASTNode::BinaryOperator *node)
 
     _precursorBuffer->emplace_back(instruction);
 }
+
+void BLSL::Flattener::visit(ASTNode::UnaryOperator *node) {}
+void BLSL::Flattener::visit(ASTNode::Literal *node) {}
+void BLSL::Flattener::visit(ASTNode::Variable *node) {}
+void BLSL::Flattener::visit(ASTNode::Func *node) {}
+void BLSL::Flattener::visit(ASTNode::For *node) {}
+void BLSL::Flattener::visit(ASTNode::While *node) {}
+void BLSL::Flattener::visit(ASTNode::If *node) {}
+void BLSL::Flattener::visit(ASTNode::MemInit *node) {}
 
 bool BLSL::RegisterPass::_free_register(Precursor::Operand op, size_t instructionIndex)
 {
